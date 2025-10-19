@@ -31,7 +31,17 @@ jobs:
           pip install -r requirements.txt
           pip install pytest # Устанавливаем pytest для запуска тестов
           
-      # Шаг 4: Запускаем SAST-сканер (Bandit) для анализа исходного кода
+      # Шаг 4: Проверяем стиль кода с помощью flake8
+      - name: Run flake8 code style check
+        run: |
+          pip install flake8
+          flake8 . --max-complexity=10 --max-line-length=88 --statistics
+        # Опции:
+        # --max-complexity=10 - максимальная сложность функций
+        # --max-line-length=88 - максимальная длина строки
+        # --statistics - показать статистику по ошибкам
+          
+      # Шаг 5: Запускаем SAST-сканер (Bandit) для анализа исходного кода
       - name: Run Bandit SAST Scan
         run: |  
           pip install bandit
@@ -44,7 +54,7 @@ jobs:
         # || true - это костыль, чтобы шаг не "падал" при найденных уязвимостях.
         # Мы обработаем результат на следующем шаге.
         
-      # Шаг 4.1: Анализируем отчет Bandit и "валим" пайплайн при критических уязвимостях
+      # Шаг 5.1: Анализируем отчет Bandit и "валим" пайплайн при критических уязвимостях
       - name: Check Bandit Results
         id: bandit-check
         run: |
@@ -60,7 +70,7 @@ jobs:
             echo "Bandit report not found. Assuming no issues."
           fi
           
-      # Шаг 4.2: Загружаем отчет Bandit как артефакт
+      # Шаг 5.2: Загружаем отчет Bandit как артефакт
       - name: Upload Bandit Report
         uses: actions/upload-artifact@v4
         with:
@@ -68,7 +78,7 @@ jobs:
           path: bandit_results.json
           retention-days: 30
           
-      # Шаг 5: Запускаем сканер зависимостей Trivy
+      # Шаг 6: Запускаем сканер зависимостей Trivy
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
@@ -79,7 +89,7 @@ jobs:
           ignore-unfixed: true # Игнорировать уязвимости, для которых нет фикса
           severity: 'HIGH,CRITICAL' # Проверять только на критические уязвимости
           
-      # Шаг 6: Запускаем наши unit-тесты
+      # Шаг 7: Запускаем наши unit-тесты
       - name: Run Tests with pytest
         run: | 
           python -m pytest tests/ -v
