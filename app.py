@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-=======
 # app.py
->>>>>>> cddd6f9de85832dc9ec7840fc2e847ff5f7ff905
 from flask import Flask, request
 app = Flask(__name__)
 @app.route('/')
