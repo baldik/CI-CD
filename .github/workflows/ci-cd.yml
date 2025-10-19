@@ -34,8 +34,7 @@ jobs:
         run: |
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
-        env:
-          PYTHONPATH: ${{ github.workspace }}
+          
       # Шаг 5: Запускаем SAST-сканер (Bandit)
       - name: Run Bandit SAST Scan
         run: |  
@@ -95,6 +94,21 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
+
+      - name: Create package files
+        run: |
+          cat > pyproject.toml << 'EOF'
+          [build-system]
+          requires = ["setuptools>=45", "wheel"]
+          build-backend = "setuptools.build_meta"
+
+          [project]
+          name = "flask-app"
+          version = "0.1.0"
+          description = "A simple Flask application"
+          requires-python = ">=3.10"
+          dependencies = ["Flask>=2.0.0"]
+          EOF
 
       - name: Upgrade pip and install build dependencies
         run: |
