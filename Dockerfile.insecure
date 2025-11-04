@@ -1,0 +1,10 @@
+# Используем очень старый, уязвимый базовый образ
+FROM python:3.7-slim
+WORKDIR /app
+# Копируем зависимости и устанавливаем их
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+# Копируем исходный код
+COPY . .
+# Запускаем приложение
+CMD ["python", "app.py"]
